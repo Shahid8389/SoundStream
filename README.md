@@ -29,10 +29,10 @@ SoundStream is a **MERN-based music streaming platform** with an **admin panel**
 ### **1️⃣ Clone the Repository**
 ```bash
 # Clone the repository
-git clone https://github.com/Shahid8389/soundstream.git
+git clone https://github.com/Shahid8389/SoundStream.git
 
 # Navigate to the project directory
-cd soundstream
+cd SoundStream
 ```
 
 ### 2️⃣ Backend Setup
