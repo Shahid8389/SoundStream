@@ -1,0 +1,76 @@
+import { v2 as cloudinary } from 'cloudinary';
+import songModel from '../models/songModel.js';
+
+const addSong = async (req, res) => {
+    try {
+        const name = req.body.name;
+        const desc = req.body.desc;
+        const album = req.body.album;
+        const audioFile = req.files.audio[0];
+        const imageFile = req.files.image[0];
+
+        // Uploading the image and the audio to the Cloudinary
+        const audioUpload = await cloudinary.uploader.upload(audioFile.path, {resource_type : "video"});
+        const imageUpload = await cloudinary.uploader.upload(imageFile.path, {resource_type : "image"});
+
+        const duration = `${Math.floor(audioUpload.duration/60)}:${Math.floor(audioUpload.duration%60)}`;
+
+        const songData = {
+            name,
+            desc,
+            album,
+            image: imageUpload.secure_url,
+            file: audioUpload.secure_url,
+            duration
+        }
+
+        // saving the songData into the MongoDB
+        const song = songModel(songData);
+        await song.save();
+
+        res.json({
+            success: true,
+            message: "Song Added.."
+        })
+        
+    } catch (error) {
+        console.log("Error! In uploading the Song Data to the Cloudinary and MongoDb");
+        res.json({
+            success: false
+        })
+    }
+}
+
+const listSong = async (req, res) => {
+    try {
+        const allSongList = await songModel.find({});
+        res.json({
+            success: true,
+            songs: allSongList
+        })
+
+    } catch (error) {
+        console.log("Error! In Fetching the Song Data from MongoDb");
+        res.json({
+            success: false
+        })
+    }
+}
+
+const removeSong = async (req, res) => {
+    try {
+        await songModel.findByIdAndDelete(req.body.id);
+        res.json({
+            success: true,
+            message: "Song Removed.."
+        })
+
+    } catch (error) {
+        console.log("Error! In Deleting the Song Data from MongoDb");
+        res.json({
+            success: false
+        })
+    }
+}
+
+export {addSong, listSong, removeSong}
